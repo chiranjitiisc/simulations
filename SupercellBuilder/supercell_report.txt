@@ -1,0 +1,46 @@
+======================================================================
+SUPERCELL BUILD REPORT
+======================================================================
+
+input CIF              : mp-48_C.cif
+replication method     : diagonal repeat 8 x 8 x 1
+unit cells in supercell: 64
+transformation matrix P (new_cell = P @ old_cell):
+    [  8   0   0]
+    [  0   8   0]
+    [  0   0   1]
+atoms: 4 (unit cell)  ->  256 (supercell)
+
+----------------------------------------------------------------------
+  UNIT CELL
+    chemical formula : C4
+    composition      : C: 4
+    number of atoms  : 4
+    a = 2.467724 A     b = 2.467724 A     c = 8.685038 A
+    alpha = 90.0000 deg   beta = 90.0000 deg   gamma = 120.0000 deg
+    cell volume      : 45.803174 A^3
+    mass density     : 1.7418 g/cm^3
+    lattice vectors (A):
+      a1 = [    2.467724     0.000000     0.000000]
+      a2 = [   -1.233862     2.137112     0.000000]
+      a3 = [    0.000000     0.000000     8.685038]
+
+----------------------------------------------------------------------
+  SUPERCELL
+    chemical formula : C256
+    composition      : C: 256
+    number of atoms  : 256
+    a = 19.741793 A     b = 19.741793 A     c = 8.685038 A
+    alpha = 90.0000 deg   beta = 90.0000 deg   gamma = 120.0000 deg
+    cell volume      : 2931.403133 A^3
+    mass density     : 1.7418 g/cm^3
+    lattice vectors (A):
+      a1 = [   19.741793     0.000000     0.000000]
+      a2 = [   -9.870897    17.096894     0.000000]
+      a3 = [    0.000000     0.000000     8.685038]
+
+----------------------------------------------------------------------
+output structure files:
+    supercell.cif
+    supercell.xyz
+    supercell.vasp
