@@ -1,0 +1,908 @@
+<title>Trajectory: MD with ASE</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --paper:      #F2F1ED;
+  --surface:    #FBFAF8;
+  --surface-2:  #E9E7E1;
+  --ink:        #1A1C1E;
+  --ink-soft:   #43464A;
+  --muted:      #74767A;
+  --rule:       #DCD9D2;
+  --rule-soft:  #E6E3DC;
+  --copper:     #A2542A;
+  --copper-dim: #C98A5E;
+  --argon:      #23707F;
+  --argon-soft: #DDEAEC;
+  --warn-bg:    #F6EBE2;
+  --code-bg:    #1C1F22;
+  --code-ink:   #DFDCD6;
+  --shadow:     0 1px 2px rgba(26,28,30,.05), 0 6px 20px -12px rgba(26,28,30,.22);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper:      #141618;
+    --surface:    #1C1F22;
+    --surface-2:  #24282B;
+    --ink:        #E9E7E3;
+    --ink-soft:   #C2C0BC;
+    --muted:      #90939A;
+    --rule:       #2E3237;
+    --rule-soft:  #26292D;
+    --copper:     #DC9260;
+    --copper-dim: #A5673F;
+    --argon:      #74BECC;
+    --argon-soft: #1D3237;
+    --warn-bg:    #2A211B;
+    --code-bg:    #0F1113;
+    --code-ink:   #DFDCD6;
+    --shadow:     0 1px 2px rgba(0,0,0,.4), 0 8px 24px -14px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"] {
+  --paper:      #141618;
+  --surface:    #1C1F22;
+  --surface-2:  #24282B;
+  --ink:        #E9E7E3;
+  --ink-soft:   #C2C0BC;
+  --muted:      #90939A;
+  --rule:       #2E3237;
+  --rule-soft:  #26292D;
+  --copper:     #DC9260;
+  --copper-dim: #A5673F;
+  --argon:      #74BECC;
+  --argon-soft: #1D3237;
+  --warn-bg:    #2A211B;
+  --code-bg:    #0F1113;
+  --code-ink:   #DFDCD6;
+  --shadow:     0 1px 2px rgba(0,0,0,.4), 0 8px 24px -14px rgba(0,0,0,.8);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap { max-width: 1000px; margin: 0 auto; padding: 0 28px 120px; }
+
+h1, h2, h3 {
+  font-family: Newsreader, Georgia, "Times New Roman", serif;
+  font-weight: 500;
+  text-wrap: balance;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+a { color: var(--argon); text-underline-offset: 3px; }
+a:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--copper); outline-offset: 3px; border-radius: 3px;
+}
+
+/* ---------- masthead ---------- */
+
+.mast { padding: 72px 0 0; }
+
+.eyebrow {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 11.5px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--copper);
+  margin: 0 0 22px;
+}
+
+.mast h1 {
+  font-size: clamp(2.6rem, 6vw, 4.1rem);
+  line-height: 1.02;
+  max-width: 16ch;
+}
+.mast h1 em { font-style: italic; color: var(--copper); }
+
+.standfirst {
+  font-family: Newsreader, Georgia, serif;
+  font-size: clamp(1.15rem, 2vw, 1.35rem);
+  line-height: 1.5;
+  color: var(--ink-soft);
+  max-width: 60ch;
+  margin: 24px 0 0;
+}
+
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  margin: 44px 0 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+.fact {
+  flex: 1 1 130px;
+  padding: 18px 22px 18px 0;
+  border-right: 1px solid var(--rule-soft);
+}
+.fact:last-child { border-right: 0; }
+.fact dt {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10.5px; letter-spacing: .13em; text-transform: uppercase;
+  color: var(--muted); margin: 0 0 4px;
+}
+.fact dd {
+  margin: 0;
+  font-family: Newsreader, Georgia, serif;
+  font-size: 1.6rem; line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.fact dd span { font-size: .82rem; font-family: "IBM Plex Sans", sans-serif; color: var(--muted); }
+
+/* ---------- generic section ---------- */
+
+section { margin-top: 76px; }
+
+.sec-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 8px; }
+.sec-head h2 { font-size: 1.85rem; }
+.sec-num {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px; letter-spacing: .12em;
+  color: var(--copper); padding-top: 4px;
+}
+.sec-intro { color: var(--ink-soft); max-width: 68ch; margin: 10px 0 0; }
+
+/* ---------- prep grid ---------- */
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 30px; }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 22px 22px 24px;
+  box-shadow: var(--shadow);
+}
+.card h3 { font-size: 1.1rem; margin-bottom: 10px; }
+.card ul { margin: 0; padding-left: 18px; font-size: 14.5px; color: var(--ink-soft); }
+.card li { margin-bottom: 6px; }
+.card li::marker { color: var(--copper-dim); }
+
+/* ---------- phase + episodes ---------- */
+
+.phase { margin-top: 56px; }
+
+.phase-bar {
+  display: flex; align-items: baseline; gap: 16px;
+  padding: 0 0 10px;
+  border-bottom: 2px solid var(--ink);
+}
+.phase-tag {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+  background: var(--ink); color: var(--paper);
+  padding: 3px 9px; border-radius: 2px;
+  white-space: nowrap;
+}
+.phase-bar h3 { font-size: 1.4rem; flex: 1; }
+.phase-meta {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11.5px; color: var(--muted); white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.phase-why {
+  color: var(--muted); font-size: 14.5px; margin: 12px 0 0; max-width: 70ch;
+  font-style: italic; font-family: Newsreader, Georgia, serif; font-size: 1.02rem;
+}
+
+.ep {
+  display: grid;
+  grid-template-columns: 78px 1fr;
+  gap: 0 24px;
+  padding: 26px 0;
+  border-bottom: 1px solid var(--rule-soft);
+}
+.ep-rail { border-right: 1px solid var(--rule-soft); padding-right: 20px; }
+.ep-no {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 1.45rem; line-height: 1;
+  color: var(--copper);
+  font-variant-numeric: tabular-nums;
+}
+.ep-time {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10.5px; color: var(--muted);
+  margin-top: 7px; letter-spacing: .04em;
+}
+.ep-body h4 {
+  font-family: Newsreader, Georgia, serif;
+  font-weight: 600; font-size: 1.22rem; margin: -3px 0 12px;
+  letter-spacing: -0.01em;
+}
+.lines { display: grid; gap: 9px; }
+.line { display: grid; grid-template-columns: 82px 1fr; gap: 14px; font-size: 14.5px; }
+.line dt {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--muted); padding-top: 5px;
+}
+.line dd { margin: 0; color: var(--ink-soft); }
+.line dd code { font-size: 12.8px; }
+.line.hook dt { color: var(--copper); }
+.line.hook dd { color: var(--ink); }
+
+code {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 13px;
+  background: var(--surface-2);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+/* ---------- code blocks ---------- */
+
+.codeblock {
+  margin: 20px 0 0;
+  border-radius: 5px;
+  overflow: hidden;
+  border: 1px solid var(--rule);
+  box-shadow: var(--shadow);
+}
+.codeblock header {
+  background: var(--surface-2);
+  padding: 9px 16px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 1px solid var(--rule);
+  display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+}
+.codeblock header b { color: var(--ink); font-weight: 500; letter-spacing: .04em; }
+.codeblock pre {
+  margin: 0; padding: 18px 20px;
+  background: var(--code-bg); color: var(--code-ink);
+  overflow-x: auto;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 12.9px; line-height: 1.62;
+}
+.codeblock pre code { background: none; padding: 0; font-size: inherit; color: inherit; }
+
+/* ---------- gotcha table ---------- */
+
+.tablewrap { overflow-x: auto; margin-top: 26px; border: 1px solid var(--rule); border-radius: 4px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 620px; }
+th, td { text-align: left; padding: 13px 18px; border-bottom: 1px solid var(--rule-soft); vertical-align: top; font-size: 14px; }
+th {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--muted); background: var(--surface-2);
+}
+tbody tr:last-child td { border-bottom: 0; }
+td:first-child code { color: var(--copper); background: none; padding: 0; }
+td:nth-child(2) code { color: var(--argon); background: none; padding: 0; }
+
+.note {
+  margin-top: 26px;
+  background: var(--warn-bg);
+  border-left: 3px solid var(--copper);
+  padding: 16px 20px;
+  border-radius: 0 4px 4px 0;
+  font-size: 14.5px;
+  color: var(--ink-soft);
+}
+.note b { color: var(--ink); }
+
+/* ---------- production ---------- */
+
+.prod { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 28px 40px; margin-top: 30px; }
+.prod h3 {
+  font-size: 1.05rem; margin-bottom: 10px; padding-bottom: 8px;
+  border-bottom: 1px solid var(--rule);
+}
+.prod p, .prod ul { font-size: 14.5px; color: var(--ink-soft); margin: 0; }
+.prod ul { padding-left: 18px; }
+.prod li { margin-bottom: 7px; }
+.prod li::marker { color: var(--copper-dim); }
+
+.closer {
+  margin-top: 76px; padding-top: 28px; border-top: 2px solid var(--ink);
+  font-family: Newsreader, Georgia, serif;
+  font-size: 1.12rem; line-height: 1.6; color: var(--ink-soft); max-width: 62ch;
+}
+.closer strong { color: var(--ink); font-weight: 600; }
+
+@media (max-width: 620px) {
+  .wrap { padding: 0 20px 90px; }
+  .mast { padding-top: 48px; }
+  .ep { grid-template-columns: 1fr; gap: 0; }
+  .ep-rail { border-right: 0; padding: 0 0 12px; display: flex; align-items: baseline; gap: 12px; }
+  .ep-time { margin-top: 0; }
+  .line { grid-template-columns: 1fr; gap: 1px; }
+  .line dt { padding-top: 6px; }
+  .fact { border-right: 0; border-bottom: 1px solid var(--rule-soft); flex-basis: 100%; }
+  .fact:last-child { border-bottom: 0; }
+}
+</style>
+
+<div class="wrap">
+
+<header class="mast">
+  <p class="eyebrow">Free YouTube series · Build order</p>
+  <h1>Molecular dynamics, <em>from Newton to ASE</em></h1>
+  <p class="standfirst">A twenty-three episode pathway for absolute beginners: people who can write a Python loop but have never watched a set of atoms move. Every concept is earned before the library hides it, and every line of ASE code below was run against ASE 3.29.0 before it was written down.</p>
+
+  <dl class="facts">
+    <div class="fact"><dt>Episodes</dt><dd>23</dd></div>
+    <div class="fact"><dt>Phases</dt><dd>6</dd></div>
+    <div class="fact"><dt>Runtime</dt><dd>7.5<span> hrs</span></dd></div>
+    <div class="fact"><dt>Per episode</dt><dd>15–25<span> min</span></dd></div>
+    <div class="fact"><dt>Cadence</dt><dd>1<span> / week</span></dd></div>
+  </dl>
+</header>
+
+<section>
+  <div class="sec-head"><span class="sec-num">A</span><h2>Before you press record</h2></div>
+  <p class="sec-intro">Two failure modes kill teaching channels in the first month: rebuilding the environment on camera every episode, and discovering mid-take that you don't know what the viewer already knows. Fix both once, here.</p>
+
+  <div class="cards">
+    <div class="card">
+      <h3>What the viewer must already have</h3>
+      <ul>
+        <li>Python loops, functions, lists — nothing more</li>
+        <li>NumPy arrays and slicing (you'll re-teach broadcasting)</li>
+        <li>School-level vectors and F = ma</li>
+        <li>No thermodynamics, no statistical mechanics, no prior MD</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>The stack you standardise on</h3>
+      <ul>
+        <li><code>conda create -n asemd python=3.11</code></li>
+        <li><code>pip install ase numpy matplotlib jupyterlab</code></li>
+        <li>ASE 3.29.0 — pin it and say the version on screen</li>
+        <li>Jupyter for episodes 1–12, plain <code>.py</code> scripts from 13 on</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Systems you never change</h3>
+      <ul>
+        <li><b>Argon</b>, Lennard-Jones — the whole theory arc</li>
+        <li><b>Copper</b>, EMT — anything metallic or solid-state</li>
+        <li>Both ship with ASE, so viewers never chase a potential file</li>
+        <li>One system per concept means the plots are comparable across episodes</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="sec-num">B</span><h2>The pathway</h2></div>
+  <p class="sec-intro">Phases are ordered by dependency, not by difficulty. Nothing in a later phase needs anything you haven't already built on camera. Each episode lists the idea, the code you type live, the demo that makes it click, and what the viewer does alone before the next upload.</p>
+
+  <!-- PHASE 0 -->
+  <div class="phase">
+    <div class="phase-bar">
+      <span class="phase-tag">Phase 0</span>
+      <h3>What are we even doing</h3>
+      <span class="phase-meta">2 eps · ~35 min</span>
+    </div>
+    <p class="phase-why">Nobody finishes a 23-part course they don't yet want. Spend two episodes buying their attention.</p>
+
+    <div class="ep">
+      <div class="ep-rail"><div class="ep-no">01</div><div class="ep-time">18 min</div></div>
+      <div class="ep-body">
+        <h4>What a molecular dynamics simulation actually is</h4>
+        <dl class="lines">
+          <div class="line"><dt>Idea</dt><dd>MD is one loop: compute forces, move atoms, repeat. Everything else — thermostats, ensembles, free energies — is bookkeeping around that loop. Show that argon melts, that a crystal has an RDF and a liquid doesn't, and that these came out of Newton's laws and nothing else.</dd></div>
+          <div class="line"><dt>On screen</dt><dd>No code. Play a rendered argon melting trajectory, then a running solid, then the two <code>g(r)</code> curves side by side.</dd></div>
+          <div class="line hook"><dt>The hook</dt><dd>Put the four-line pseudocode of the MD loop on one slide and say: "by episode 10 you will have written every line of this yourself, and you will know why each one is there."</dd></div>
+          <div class="line"><dt>Homework</dt><dd>Install the environment. That's it.</dd></div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="ep">
+      <div class="ep-rail"><div class="ep-no">02</div><div class="ep-time">16 min</div></div>
+      <div class="ep-body">
+        <h4>Setting up, and meeting the Atoms object</h4>
+        <dl class="lines">
+          <div class="line"><dt>Idea</dt><dd>ASE's whole design in one sentence: an <code>Atoms</code> object holds <i>what and where</i>, a calculator answers <i>how much energy and force</i>, and a dynamics object decides <i>what moves next</i>. Nothing else to learn.</dd></div>
+          <div class="line"><dt>On screen</dt><dd><code>conda</code> env from scratch, <code>pip install ase</code>, then <code>from ase.build import molecule, bulk</code>, inspect <code>.positions</code>, <code>.get_chemical_symbols()</code>, <code>.cell</code>, and <code>view(atoms)</code>.</dd></div>
+          <div class="line hook"><dt>The hook</dt><dd>Build a water molecule and a copper crystal in four lines each, rotate them in the ASE GUI. Instant payoff, zero theory.</dd></div>
+          <div class="line"><dt>Homework</dt><dd>Build three structures of their choosing and post a screenshot in the comments.</dd></div>
+        </dl>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 1 -->
+  <div class="phase">
+    <div class="phase-bar">
+      <span class="phase-tag">Phase 1</span>
+      <h3>MD from first principles — no library allowed</h3>
+      <span class="phase-meta">5 eps · ~1h 45m</span>
+    </div>
+    <p class="phase-why">This is the phase that separates your channel from every "here's a script, run it" tutorial. NumPy only. When ASE arrives in Phase 2 the viewer already knows what it is doing for them.</p>
+
+    <div class="ep">
+      <div class="ep-rail"><div class="ep-no">03</div><div class="ep-time">22 min</div></div>
+      <div class="ep-body">
+        <h4>Potential energy surfaces and where forces come from</h4>
+        <dl class="lines">
+          <div class="line"><dt>Idea</dt><dd>Energy is a function of all the coordinates. Force is minus its gradient. The Lennard-Jones form, why <em>r</em><sup>−12</sup> and <em>r</em><sup>−6</sup>, what ε and σ physically mean.</dd></div>
+          <div class="line"><dt>On screen</dt><dd>Plot LJ energy and its analytic derivative for two argon atoms. Write <code>lj_energy(r)</code> and <code>lj_force(r)</code> in ten lines. Verify the analytic force against a finite difference.</dd></div>
+          <div class="line hook"><dt>The hook</dt><dd>Slide two atoms together and watch the force flip sign at the minimum. That single plot is the physical intuition for the rest of the series.</dd></div>
+          <div class="line"><dt>Homework</dt><dd>Repeat for the Morse potential and compare the well shapes.</dd></div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="ep">
+      <div class="ep-rail"><div class="ep-no">04</div><div class="ep-time">24 min</div></div>
+      <div class="ep-body">
+        <h4>Integrating Newton: why velocity Verlet and not Euler</h4>
+        <dl class="lines">
+          <div class="line"><dt>Idea</dt><dd>Discretising <em>F = ma</em>. Forward Euler, its energy blow-up, then velocity Verlet: half-kick, drift, force, half-kick. Time-reversibility and symplecticity in plain words — no proofs.</dd></div>
+          <div class="line"><dt>On screen</dt><dd>Both integrators for a 1-D harmonic oscillator, ~30 lines of NumPy. Plot total energy against time for each.</dd></div>
+          <div class="line hook"><dt>The hook</dt><dd>Euler's energy climbs off the top of the plot while Verlet's oscillates around a flat line — at identical timestep and identical cost. The viewer never asks "why Verlet?" again.</dd></div>
+          <div class="line"><dt>Homework</dt><dd>Extend to two LJ atoms in 3-D using the force from episode 3.</dd></div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="ep">
+      <div class="ep-rail"><div class="ep-no">05</div><div class="ep-time">18 min</div></div>
+      <div class="ep-body">
+        <h4>Choosing a timestep, and the femtosecond</h4>
+        <dl class="lines">
+          <div class="line"><dt>Idea</dt><dd>The timestep must resolve the fastest vibration in the system. The rule of thumb: roughly one tenth of the shortest period. Why that is ~1 fs for anything with hydrogen and can be 5 fs for heavy noble gases.</dd></div>
+          <div class="line"><dt>On screen</dt><dd>Run the same oscillator at increasing <code>dt</code> until it explodes. Then measure energy drift per atom as a function of <code>dt</code>.</dd></div>
+          <div class="line hook"><dt>The hook</dt><dd>The drift table from a real copper run (verified, see Appendix C): 0.006 → 0.141 → 0.395 meV per atom as <code>dt</code> goes 1 → 5 → 10 fs. Drift is a number you measure, not a vibe.</dd></div>
+          <div class="line"><dt>Homework</dt><dd>Find the timestep at which their own two-atom code loses 1 meV/atom over 1 ps.</dd></div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="ep">
+      <div class="ep-rail"><div class="ep-no">06</div><div class="ep-time">21 min</div></div>
+      <div class="ep-body">
+        <h4>Temperature is not a knob — it's a measurement</h4>
+        <dl class="lines">
+          <div class="line"><dt>Idea</dt><dd>Equipartition: ⟨KE⟩ = (3/2)<em>N k</em><sub>B</sub><em>T</em>, so temperature is read <i>out of</i> the velocities. The Maxwell–Boltzmann distribution and why a fresh simulation loses half its temperature in the first picosecond.</dd></div>
+          <div class="line"><dt>On screen</dt><dd>Draw velocities from a Gaussian, histogram the speeds against the analytic Maxwell–Boltzmann curve, compute instantaneous <em>T</em>, watch it fluctuate.</dd></div>
+          <div class="line hook"><dt>The hook</dt><dd>Initialise at 300 K, run 200 steps, measure 150 K. Explain equipartition between kinetic and potential energy — the single most common beginner confusion, defused before they ever hit it.</dd></div>
+          <div class="line"><dt>Homework</dt><dd>Show that instantaneous <em>T</em> fluctuates less as <em>N</em> grows.</dd></div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="ep">
+      <div class="ep-rail"><div class="ep-no">07</div><div class="ep-time">20 min</div></div>
+      <div class="ep-body">
+        <h4>Periodic boundaries and the minimum image convention</h4>
+        <dl class="lines">
+          <div class="line"><dt>Idea</dt><dd>A hundred atoms in a vacuum is a droplet, not a bulk. PBC removes the surface. The minimum image convention, the cutoff radius, and the hard rule: <em>r</em><sub>cut</sub> must be less than half the shortest box length.</dd></div>
+          <div class="line"><dt>On screen</dt><dd>Wrap coordinates by hand, implement minimum-image distance in three lines, draw the 2-D tiled box.</dd></div>
+          <div class="line hook"><dt>The hook</dt><dd>Trigger ASE's real error live — <code>CellTooSmall: the cell is not large enough</code>. Viewers who meet an error with you don't fear it alone at 2 a.m.</dd></div>
+          <div class="line"><dt>Homework</dt><dd>Given a cubic box of 15.78 Å, what is the largest legal <em>r</em><sub>max</sub> for an RDF? (Answer: 7.89 Å.)</dd></div>
+        </dl>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div class="phase">
+    <div class="phase-bar">
+      <span class="phase-tag">Phase 2</span>
+      <h3>ASE takes over the loop</h3>
+      <span class="phase-meta">5 eps · ~1h 40m</span>
+    </div>
+    <p class="phase-why">Now every ASE call maps onto something the viewer already wrote by hand. This is the phase where the series stops being a physics course and becomes a tool course.</p>
+
+    <div class="ep">
+      <div class="ep-rail"><div class="ep-no">08</div><div class="ep-time">20 min</div></div>
+      <div class="ep-body">
+        <h4>The Atoms object, properly</h4>
+        <dl class="lines">
+          <div class="line"><dt>Idea</dt><dd><code>positions</code>, <code>cell</code>, <code>pbc</code>, <code>numbers</code>, <code>momenta</code> — five arrays that fully define a simulation state. Slicing, repeating, constraints, and the <code>ase.build</code> module.</dd></div>
+          <div class="line"><dt>On screen</dt><dd><code>bulk('Ar', 'fcc', a=5.26, cubic=True) * (3,3,3)</code>; inspect every array; use <code>fcc111</code> to make a surface; save and reload with <code>ase.io.write</code>/<code>read</code>.</dd></div>
+          <div class="line hook"><dt>The hook</dt><dd>Show that <code>atoms * (3,3,3)</code> replaces the fifty-line supercell builder they were about to write.</dd></div>
+          <div class="line"><dt>Homework</dt><dd>Build a 4-layer Cu(111) slab with 10 Å vacuum and count the surface atoms.</dd></div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="ep">
+      <div class="ep-rail"><div class="ep-no">09</div><div class="ep-time">19 min</div></div>
+      <div class="ep-body">
+        <h4>Calculators: the one interface that runs everything</h4>
+        <dl class="lines">
+          <div class="line"><dt>Idea</dt><dd>A calculator is a contract: give it an <code>Atoms</code>, ask for energy, forces, stress. LJ, EMT, DFT codes, and machine-learned potentials all satisfy the same contract — which is why swapping physics is a one-line change.</dd></div>
+          <div class="line"><dt>On screen</dt><dd>Attach <code>LennardJones</code>, then <code>EMT</code>; call <code>get_potential_energy()</code>, <code>get_forces()</code>, <code>get_stress()</code>. Show that results are cached until positions change.</dd></div>
+          <div class="line hook"><dt>The hook</dt><dd>Compare your hand-written episode-3 LJ force against ASE's <code>LennardJones</code> for the same geometry. They agree to machine precision. The library is not magic — it is your code, tested.</dd></div>
+          <div class="line"><dt>Homework</dt><dd>List which ASE calculators are installed on their machine and which need external binaries.</dd></div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="ep">
+      <div class="ep-rail"><div class="ep-no">10</div><div class="ep-time">17 min</div></div>
+      <div class="ep-body">
+        <h4>Your first real MD run — NVE in fifteen lines</h4>
+        <dl class="lines">
+          <div class="line"><dt>Idea</dt><dd>The payoff episode. Structure → calculator → initial velocities → integrator → run. Constant energy, constant volume, constant number: the NVE ensemble.</dd></div>
+          <div class="line"><dt>On screen</dt><dd>Appendix A, verbatim, typed live. <code>thermalize_momenta</code>, <code>VelocityVerlet</code>, <code>dyn.run(200)</code>, plus <code>ase.units.fs</code> and why ASE's internal time unit is not femtoseconds.</dd></div>
+          <div class="line hook"><dt>The hook</dt><dd>Fifteen lines reproduce what took the whole of Phase 1 by hand. Say so out loud — this is the emotional peak of the series.</dd></div>
+          <div class="line"><dt>Homework</dt><dd>Run the same script for argon and for copper; compare the energy drift.</dd></div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="ep">
+      <div class="ep-rail"><div class="ep-no">11</div><div class="ep-time">21 min</div></div>
+      <div class="ep-body">
+        <h4>Instrumenting a run: observers, loggers, trajectories</h4>
+        <dl class="lines">
+          <div class="line"><dt>Idea</dt><dd>A simulation you can't inspect is a simulation you can't trust. ASE's observer pattern: <code>dyn.attach(callable, interval=n)</code>. Anything callable works, including your own function.</dd></div>
+          <div class="line"><dt>On screen</dt><dd><code>MDLogger</code> writing <code>md.log</code>, <code>Trajectory</code> writing <code>.traj</code>, then a custom observer that prints a warning when <em>T</em> drifts beyond a band.</dd></div>
+          <div class="line hook"><dt>The hook</dt><dd>Attach a live matplotlib callback that redraws the temperature trace every 20 steps. Watching the run breathe on screen is the most re-watched moment you will produce.</dd></div>
+          <div class="line"><dt>Homework</dt><dd>Write an observer that dumps a snapshot only when the potential energy hits a new minimum.</dd></div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="ep">
+      <div class="ep-rail"><div class="ep-no">12</div><div class="ep-time">22 min</div></div>
+      <div class="ep-body">
+        <h4>Relax before you run: optimisers and starting structures</h4>
+        <dl class="lines">
+          <div class="line"><dt>Idea</dt><dd>A badly built structure has enormous forces, so MD converts them into enormous heat and the run is garbage. Geometry optimisation (<code>BFGS</code>, <code>FIRE</code>) versus dynamics: one seeks the minimum, the other samples around it.</dd></div>
+          <div class="line"><dt>On screen</dt><dd>Deliberately place two atoms 0.5 Å apart, run MD, watch it explode. Then relax with <code>BFGS(atoms).run(fmax=0.05)</code> and rerun cleanly.</dd></div>
+          <div class="line hook"><dt>The hook</dt><dd>The explosion. Show the failure first, name it, then fix it — the sequence viewers remember when it happens to them.</dd></div>
+          <div class="line"><dt>Homework</dt><dd>Relax a Cu surface slab and report the change in the top interlayer spacing.</dd></div>
+        </dl>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 3 -->
+  <div class="phase">
+    <div class="phase-bar">
+      <span class="phase-tag">Phase 3</span>
+      <h3>Ensembles: controlling temperature and pressure</h3>
+      <span class="phase-meta">4 eps · ~1h 25m</span>
+    </div>
+    <p class="phase-why">The phase where most beginners silently produce wrong results — wrong ensemble, wrong friction, no equilibration. Teach the failure modes as hard as the API.</p>
+
+    <div class="ep">
+      <div class="ep-rail"><div class="ep-no">13</div><div class="ep-time">20 min</div></div>
+      <div class="ep-body">
+        <h4>NVE, NVT, NPT — what an ensemble actually means</h4>
+        <dl class="lines">
+          <div class="line"><dt>Idea</dt><dd>An ensemble is the set of microstates your simulation is allowed to visit. NVE conserves energy but not temperature; NVT lets energy flow to a bath; NPT lets the box breathe. Which one matches which experiment.</dd></div>
+          <div class="line"><dt>On screen</dt><dd>The same argon system in all three, three temperature traces on one plot.</dd></div>
+          <div class="line hook"><dt>The hook</dt><dd>State the rule they'll carry forever: "choose the ensemble that matches how your experiment is controlled, not the one that's easiest to run."</dd></div>
+          <div class="line"><dt>Homework</dt><dd>Which ensemble for a sealed autoclave? For an open crucible? Answer in the comments.</dd></div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="ep">
+      <div class="ep-rail"><div class="ep-no">14</div><div class="ep-time">25 min</div></div>
+      <div class="ep-body">
+        <h4>Thermostats in ASE, and how to pick one</h4>
+        <dl class="lines">
+          <div class="line"><dt>Idea</dt><dd>Four families, four trade-offs: <code>Langevin</code> (stochastic, robust, kills real dynamics), <code>NVTBerendsen</code> (fast equilibration, wrong distribution), <code>Bussi</code> (correct canonical, gentle), <code>NoseHooverChainNVT</code> (deterministic, correct, needs tuning). What friction and <code>taut</code> physically do.</dd></div>
+          <div class="line"><dt>On screen</dt><dd>The same system under all four; plot the temperature distribution against the analytic canonical width.</dd></div>
+          <div class="line hook"><dt>The hook</dt><dd>Sweep Langevin friction over three orders of magnitude. Too weak and it never equilibrates; too strong and the atoms stop diffusing. Then say plainly: never measure a diffusion coefficient under a strong Langevin thermostat.</dd></div>
+          <div class="line"><dt>Homework</dt><dd>Find the friction at which their argon's diffusion coefficient starts to drop.</dd></div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="ep">
+      <div class="ep-rail"><div class="ep-no">15</div><div class="ep-time">22 min</div></div>
+      <div class="ep-body">
+        <h4>Barostats and NPT: letting the box breathe</h4>
+        <dl class="lines">
+          <div class="line"><dt>Idea</dt><dd>Pressure from the virial and the stress tensor. Isotropic versus fully flexible cells. In ASE 3.29 the modern route is <code>IsotropicMTKNPT</code> / <code>MTKNPT</code>; the old <code>ase.md.npt.NPT</code> now lives at <code>ase.md.melchionna.MelchionnaNPT</code>.</dd></div>
+          <div class="line"><dt>On screen</dt><dd>NPT copper at several temperatures; plot the cell volume; extract the thermal expansion coefficient.</dd></div>
+          <div class="line hook"><dt>The hook</dt><dd>A number they can check against a handbook. Nothing builds trust in a simulation like reproducing a measured material property.</dd></div>
+          <div class="line"><dt>Homework</dt><dd>Repeat for argon and explain why the expansion is so much larger.</dd></div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="ep">
+      <div class="ep-rail"><div class="ep-no">16</div><div class="ep-time">18 min</div></div>
+      <div class="ep-body">
+        <h4>Equilibration versus production, and how to tell them apart</h4>
+        <dl class="lines">
+          <div class="line"><dt>Idea</dt><dd>The first part of every trajectory is memory of your initial guess and must be discarded. Practical tests: running averages that flatten, forward-and-reverse averages that agree, block averages that stop shifting.</dd></div>
+          <div class="line"><dt>On screen</dt><dd>Plot potential energy against time from a deliberately bad start; mark the equilibration cut; recompute averages on both sides of it.</dd></div>
+          <div class="line hook"><dt>The hook</dt><dd>Compute the same average with and without discarding equilibration. The two numbers differ enough to change a conclusion.</dd></div>
+          <div class="line"><dt>Homework</dt><dd>Justify an equilibration cut for their own run with a plot, not a guess.</dd></div>
+        </dl>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 4 -->
+  <div class="phase">
+    <div class="phase-bar">
+      <span class="phase-tag">Phase 4</span>
+      <h3>Getting numbers out of a trajectory</h3>
+      <span class="phase-meta">4 eps · ~1h 25m</span>
+    </div>
+    <p class="phase-why">Running MD is easy. Extracting a defensible number with an error bar is the actual skill, and almost no free tutorial teaches it.</p>
+
+    <div class="ep">
+      <div class="ep-rail"><div class="ep-no">17</div><div class="ep-time">20 min</div></div>
+      <div class="ep-body">
+        <h4>Reading trajectories, averaging, and error bars</h4>
+        <dl class="lines">
+          <div class="line"><dt>Idea</dt><dd>Consecutive MD frames are correlated, so the naive standard error is far too small. Block averaging, correlation time, and why "N = 10,000 steps" is not N = 10,000 samples.</dd></div>
+          <div class="line"><dt>On screen</dt><dd><code>read('md.traj', index=':')</code>; loop frames; write a ten-line block-averaging function; show the error bar growing to its true value as block size increases.</dd></div>
+          <div class="line hook"><dt>The hook</dt><dd>An error bar that grows by 5× when computed correctly. This is the episode that makes researchers subscribe.</dd></div>
+          <div class="line"><dt>Homework</dt><dd>Report their mean potential energy with a block-averaged uncertainty.</dd></div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="ep">
+      <div class="ep-rail"><div class="ep-no">18</div><div class="ep-time">22 min</div></div>
+      <div class="ep-body">
+        <h4>Structure: the radial distribution function</h4>
+        <dl class="lines">
+          <div class="line"><dt>Idea</dt><dd>What <em>g(r)</em> counts, why it goes to 1 at large <em>r</em>, and how to read solid, liquid and gas off its shape. Coordination number as the integral of the first peak.</dd></div>
+          <div class="line"><dt>On screen</dt><dd>Appendix B. <code>from ase.geometry.rdf import get_rdf</code> — since ASE 3.28 it takes a whole list of frames and averages for you. Hit the <code>CellTooSmall</code> error on purpose and fix it.</dd></div>
+          <div class="line hook"><dt>The hook</dt><dd>Overlay <em>g(r)</em> at 40 K and 120 K. Sharp peaks collapse into a liquid's broad first shell. You can <i>see</i> melting in a single plot.</dd></div>
+          <div class="line"><dt>Homework</dt><dd>Integrate the first peak and recover the fcc coordination number of 12.</dd></div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="ep">
+      <div class="ep-rail"><div class="ep-no">19</div><div class="ep-time">22 min</div></div>
+      <div class="ep-body">
+        <h4>Dynamics: mean squared displacement and diffusion</h4>
+        <dl class="lines">
+          <div class="line"><dt>Idea</dt><dd>MSD versus time: ballistic at short times, linear at long times. The Einstein relation ⟨<em>r</em>²⟩ = 6<em>Dt</em>. Why a solid's MSD plateaus and a liquid's does not, and the trap of unwrapping coordinates across PBC.</dd></div>
+          <div class="line"><dt>On screen</dt><dd>MSD by hand from the trajectory, then ASE's <code>DiffusionCoefficient</code> for comparison. Fit only the linear regime and say why.</dd></div>
+          <div class="line hook"><dt>The hook</dt><dd>Same plot for solid and liquid argon. A flat line versus a straight climb — the cleanest definition of "solid" a beginner will ever see.</dd></div>
+          <div class="line"><dt>Homework</dt><dd>Extract <em>D</em> at three temperatures and make an Arrhenius plot.</dd></div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="ep">
+      <div class="ep-rail"><div class="ep-no">20</div><div class="ep-time">25 min</div></div>
+      <div class="ep-body">
+        <h4>Mini-project: melt a crystal, start to finish</h4>
+        <dl class="lines">
+          <div class="line"><dt>Idea</dt><dd>Everything at once, unedited: build, relax, equilibrate, heat in stages, detect the transition with <em>g(r)</em>, MSD and the energy jump, report a melting temperature with an honest uncertainty.</dd></div>
+          <div class="line"><dt>On screen</dt><dd>One script, one notebook, one figure with four panels. Narrate the decisions, not the syntax.</dd></div>
+          <div class="line hook"><dt>The hook</dt><dd>Leave in one mistake and the debugging. Viewers learn more from watching you recover than from watching you succeed.</dd></div>
+          <div class="line"><dt>Homework</dt><dd>Reproduce it for copper and compare against the experimental melting point. Discuss why EMT is off.</dd></div>
+        </dl>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 5 -->
+  <div class="phase">
+    <div class="phase-bar">
+      <span class="phase-tag">Phase 5</span>
+      <h3>The on-ramp to real research</h3>
+      <span class="phase-meta">3 eps · ~1h 5m</span>
+    </div>
+    <p class="phase-why">Where your own work becomes the teaching material, and where the series earns a second season.</p>
+
+    <div class="ep">
+      <div class="ep-rail"><div class="ep-no">21</div><div class="ep-time">25 min</div></div>
+      <div class="ep-body">
+        <h4>Machine-learned potentials as ASE calculators</h4>
+        <dl class="lines">
+          <div class="line"><dt>Idea</dt><dd>LJ and EMT can't describe real chemistry. Foundation MLIPs — MACE, NequIP, CHGNet — reach near-DFT accuracy at a tiny fraction of the cost, and they plug into the exact same calculator interface from episode 9.</dd></div>
+          <div class="line"><dt>On screen</dt><dd><code>pip install mace-torch</code>, load a foundation model, swap it in for <code>EMT</code> — one line — and rerun episode 10 unchanged.</dd></div>
+          <div class="line hook"><dt>The hook</dt><dd>The one-line swap. Everything they learned in Phases 2–4 transfers instantly to research-grade physics. Also state the honest cost: seconds per step instead of microseconds, and a GPU.</dd></div>
+          <div class="line"><dt>Homework</dt><dd>Compare the Cu lattice constant from EMT and from an MLIP against experiment.</dd></div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="ep">
+      <div class="ep-rail"><div class="ep-no">22</div><div class="ep-time">22 min</div></div>
+      <div class="ep-body">
+        <h4>When ASE isn't the engine: LAMMPS, VASP, and the handoff</h4>
+        <dl class="lines">
+          <div class="line"><dt>Idea</dt><dd>ASE integrating in Python is fine for thousands of atoms, wrong for millions. Its two other roles: writing input files for a production code, and driving one over a socket. Choosing between them.</dd></div>
+          <div class="line"><dt>On screen</dt><dd>Build a structure in ASE, write a LAMMPS data file and a VASP POSCAR, then read the output trajectory back for analysis with the Phase 4 tools.</dd></div>
+          <div class="line hook"><dt>The hook</dt><dd>Position ASE honestly: the best preparation and analysis layer in the field, and a fine engine for small systems. Credibility beats hype.</dd></div>
+          <div class="line"><dt>Homework</dt><dd>Convert one of their structures to three different input formats.</dd></div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="ep">
+      <div class="ep-rail"><div class="ep-no">23</div><div class="ep-time">18 min</div></div>
+      <div class="ep-body">
+        <h4>Reproducibility, and what to actually report</h4>
+        <dl class="lines">
+          <div class="line"><dt>Idea</dt><dd>Random seeds, pinned versions, scripts over notebooks, and a repo layout that survives a reviewer. The minimum a methods section must state: potential, ensemble, thermostat and its coupling, timestep, system size, equilibration and production lengths, seed.</dd></div>
+          <div class="line"><dt>On screen</dt><dd>Turn the episode-20 notebook into a clean repo with <code>environment.yml</code>, a seeded script and a README.</dd></div>
+          <div class="line hook"><dt>The hook</dt><dd>Run the same script twice with a fixed seed for identical output, then change one digit and get a different answer. Determinism is a choice you make.</dd></div>
+          <div class="line"><dt>Homework</dt><dd>Write the methods paragraph for their episode-20 result. Best one gets pinned.</dd></div>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="sec-num">C</span><h2>Verified code</h2></div>
+  <p class="sec-intro">These three snippets were executed against ASE 3.29.0 on Python 3.11 before being written here. Type them on screen exactly as they appear; they are the spine of episodes 10, 11 and 18.</p>
+
+  <div class="codeblock">
+    <header><b>Appendix A — episode 10</b><span>NVE, the smallest complete MD run</span></header>
+    <pre><code>from ase.build import bulk
+from ase.calculators.emt import EMT
+from ase.md.velocitydistribution import thermalize_momenta
+from ase.md.verlet import VelocityVerlet
+from ase import units
+
+atoms = bulk('Cu', 'fcc', a=3.61, cubic=True) * (2, 2, 2)
+atoms.calc = EMT()
+
+thermalize_momenta(atoms, temperature_K=300)
+
+dyn = VelocityVerlet(atoms, timestep=1.0 * units.fs)
+dyn.attach(lambda: print(f"E = {atoms.get_total_energy():.4f} eV   "
+                         f"T = {atoms.get_temperature():.1f} K"),
+           interval=10)
+dyn.run(200)</code></pre>
+  </div>
+
+  <div class="codeblock">
+    <header><b>Appendix B — episodes 11 &amp; 18</b><span>NVT argon, logged, saved, and analysed</span></header>
+    <pre><code>import numpy as np
+from ase.build import bulk
+from ase.calculators.lj import LennardJones
+from ase.constraints import FixCom
+from ase.md.velocitydistribution import thermalize_momenta
+from ase.md.langevin import Langevin
+from ase.md import MDLogger
+from ase.io.trajectory import Trajectory
+from ase.io import read
+from ase.geometry.rdf import get_rdf
+from ase import units
+
+atoms = bulk('Ar', 'fcc', a=5.26, cubic=True) * (3, 3, 3)
+atoms.calc = LennardJones(epsilon=0.0104, sigma=3.40, rc=10.0)
+atoms.set_constraint(FixCom())          # modern replacement for fixcm=True
+thermalize_momenta(atoms, temperature_K=90)
+
+dyn = Langevin(atoms, timestep=5.0 * units.fs, temperature_K=90,
+               friction=0.01 / units.fs, fixcm=False)
+
+dyn.attach(MDLogger(dyn, atoms, 'md.log', header=True,
+                    peratom=True, mode='w'), interval=20)
+traj = Trajectory('ar.traj', 'w', atoms)
+dyn.attach(traj.write, interval=20)
+
+dyn.run(400)
+traj.close()
+
+frames = read('ar.traj', index='5:')    # drop equilibration
+g, r = get_rdf(frames, rmax=7.0, nbins=140)
+print("first peak at r =", round(float(r[np.argmax(g)]), 2), "A")
+# -> first peak at r = 3.62 A</code></pre>
+  </div>
+
+  <div class="codeblock">
+    <header><b>Appendix C — episode 5</b><span>Energy drift as a function of timestep</span></header>
+    <pre><code>import numpy as np
+from ase.build import bulk
+from ase.calculators.emt import EMT
+from ase.md.velocitydistribution import thermalize_momenta
+from ase.md.verlet import VelocityVerlet
+from ase import units
+
+for dt in [1.0, 5.0, 10.0]:
+    a = bulk('Cu', 'fcc', a=3.61, cubic=True) * (2, 2, 2)
+    a.calc = EMT()
+    thermalize_momenta(a, temperature_K=300, rng=np.random.RandomState(0))
+    e0 = a.get_total_energy()
+    VelocityVerlet(a, timestep=dt * units.fs).run(200)
+    drift = (a.get_total_energy() - e0) / len(a) * 1000
+    print(f"dt = {dt:5.1f} fs   drift = {drift:8.3f} meV/atom")
+
+# dt =   1.0 fs   drift =    0.006 meV/atom
+# dt =   5.0 fs   drift =    0.141 meV/atom
+# dt =  10.0 fs   drift =    0.395 meV/atom</code></pre>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="sec-num">D</span><h2>API changes that will date your videos</h2></div>
+  <p class="sec-intro">Recent ASE releases renamed several of the functions every older MD tutorial on YouTube still uses. If you teach the old names your videos are stale on upload; if you teach the new ones and mention the old, you become the tutorial people find when their copied script warns at them.</p>
+
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Deprecated</th><th>Use instead</th><th>Say this on camera</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>MaxwellBoltzmannDistribution(...)</code></td>
+          <td><code>thermalize_momenta(...)</code></td>
+          <td>Same physics, added in 3.29. Every older tutorial uses the old name — mention it so viewers recognise it in the wild.</td>
+        </tr>
+        <tr>
+          <td><code>Langevin(..., fixcm=True)</code></td>
+          <td><code>FixCom()</code> constraint + <code>fixcm=False</code></td>
+          <td>Deprecated in 3.28 because <code>fixcm=True</code> does not sample the correct NVT distribution — noticeable in small systems.</td>
+        </tr>
+        <tr>
+          <td><code>ase.md.npt.NPT</code></td>
+          <td><code>MelchionnaNPT</code>, or <code>IsotropicMTKNPT</code></td>
+          <td>Moved to <code>ase.md.melchionna</code>. Prefer the newer MTK barostats in <code>ase.md.nose_hoover_chain</code>.</td>
+        </tr>
+        <tr>
+          <td><code>Analysis(...).get_rdf(...)</code></td>
+          <td><code>ase.geometry.rdf.get_rdf(...)</code></td>
+          <td>Since 3.28 it accepts a list of frames and averages over them. Partial RDFs were also fixed in 3.27 to match LAMMPS conventions.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note"><b>Put the version on screen in every episode.</b> A one-line <code>print(ase.__version__)</code> in the first cell costs three seconds and saves you a hundred "this doesn't work for me" comments. Pin the current version in each description and add a comment when something breaks.</div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="sec-num">E</span><h2>Production notes</h2></div>
+
+  <div class="prod">
+    <div>
+      <h3>Recording</h3>
+      <ul>
+        <li>Editor font at 18–20 pt minimum — most viewers are on a phone</li>
+        <li>Light theme records better than dark for legibility at low bitrate</li>
+        <li>1080p is enough; a clean microphone matters ten times more than resolution</li>
+        <li>OBS with two scenes: full-screen code, and slides with a webcam corner</li>
+        <li>Type the code live. Pasting loses the viewer's hands and their attention</li>
+      </ul>
+    </div>
+    <div>
+      <h3>The repository</h3>
+      <ul>
+        <li>One public repo, one folder per episode: <code>ep03_lj_forces/</code></li>
+        <li><code>environment.yml</code> at the root, pinned, tested on a clean machine</li>
+        <li>Every episode folder ships the finished script <i>and</i> a stub with TODOs for the homework</li>
+        <li>Link the exact folder in the first line of the description</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Titles and discovery</h3>
+      <ul>
+        <li>Front-load the search term: "Molecular Dynamics in Python — Velocity Verlet from Scratch (ASE #4)"</li>
+        <li>Series number goes at the end, never the start — "#4" as a title opener kills click-through from search</li>
+        <li>One consistent thumbnail template: episode number large, one plot, three words maximum</li>
+        <li>Episodes 3, 10, 14, 18 and 19 answer questions people actively search for. Those are your entry points — make them strong enough to stand alone</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Cadence and sequencing</h3>
+      <ul>
+        <li>Record Phases 0–2 (episodes 1–12) fully before publishing episode 1</li>
+        <li>Then publish weekly, same day, while recording Phases 3–5</li>
+        <li>A buffer of ten finished episodes is what survives a conference week or a paper deadline</li>
+        <li>Pin a comment on episode 1 with the full pathway so viewers can see where it goes</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<p class="closer"><strong>If you can only make ten episodes</strong>, make 1, 3, 4, 6, 8, 9, 10, 11, 14 and 18. That subset still takes an absolute beginner from nothing to a correctly thermostatted simulation with a structural observable — and it's a complete, finishable thing rather than an abandoned course.</p>
+
+</div>

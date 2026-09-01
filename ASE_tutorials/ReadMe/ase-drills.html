@@ -1,0 +1,724 @@
+<title>Fourteen ASE Drills</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root {
+  --paper:      #F2F1ED;
+  --surface:    #FBFAF8;
+  --surface-2:  #E9E7E1;
+  --ink:        #1A1C1E;
+  --ink-soft:   #43464A;
+  --muted:      #74767A;
+  --rule:       #DCD9D2;
+  --rule-soft:  #E6E3DC;
+  --accent:     #1E6675;
+  --accent-dim: #6BA8B3;
+  --accent-wash:#E0EBED;
+  --copper:     #A2542A;
+  --code-bg:    #1C1F22;
+  --code-ink:   #DFDCD6;
+  --done:       #3F7A52;
+  --shadow:     0 1px 2px rgba(26,28,30,.05), 0 6px 20px -12px rgba(26,28,30,.22);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper:      #141618;
+    --surface:    #1C1F22;
+    --surface-2:  #24282B;
+    --ink:        #E9E7E3;
+    --ink-soft:   #C2C0BC;
+    --muted:      #90939A;
+    --rule:       #2E3237;
+    --rule-soft:  #26292D;
+    --accent:     #74BECC;
+    --accent-dim: #47818D;
+    --accent-wash:#1B3036;
+    --copper:     #DC9260;
+    --code-bg:    #0F1113;
+    --code-ink:   #DFDCD6;
+    --done:       #7FB894;
+    --shadow:     0 1px 2px rgba(0,0,0,.4), 0 8px 24px -14px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"] {
+  --paper:      #141618;
+  --surface:    #1C1F22;
+  --surface-2:  #24282B;
+  --ink:        #E9E7E3;
+  --ink-soft:   #C2C0BC;
+  --muted:      #90939A;
+  --rule:       #2E3237;
+  --rule-soft:  #26292D;
+  --accent:     #74BECC;
+  --accent-dim: #47818D;
+  --accent-wash:#1B3036;
+  --copper:     #DC9260;
+  --code-bg:    #0F1113;
+  --code-ink:   #DFDCD6;
+  --done:       #7FB894;
+  --shadow:     0 1px 2px rgba(0,0,0,.4), 0 8px 24px -14px rgba(0,0,0,.8);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 940px; margin: 0 auto; padding: 0 26px 110px; }
+
+h1, h2, h3 {
+  font-family: Newsreader, Georgia, "Times New Roman", serif;
+  font-weight: 500; text-wrap: balance; margin: 0; letter-spacing: -0.01em;
+}
+code, .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+code {
+  font-size: 12.9px; background: var(--surface-2);
+  padding: 1px 5px; border-radius: 3px;
+}
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
+
+/* masthead */
+.mast { padding: 66px 0 0; }
+.eyebrow {
+  font-family: "IBM Plex Mono", monospace; font-size: 11.5px;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--accent);
+  margin: 0 0 20px;
+}
+.mast h1 { font-size: clamp(2.4rem, 5.5vw, 3.7rem); line-height: 1.04; max-width: 17ch; }
+.standfirst {
+  font-family: Newsreader, Georgia, serif; font-size: clamp(1.1rem, 2vw, 1.3rem);
+  line-height: 1.5; color: var(--ink-soft); max-width: 62ch; margin: 22px 0 0;
+}
+
+/* progress */
+.progress {
+  margin: 38px 0 0; padding: 18px 22px;
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: 5px; box-shadow: var(--shadow);
+  display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+}
+.progress-bar { flex: 1 1 200px; height: 7px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+.progress-fill { height: 100%; width: 0%; background: var(--done); transition: width .3s ease; }
+@media (prefers-reduced-motion: reduce) { .progress-fill { transition: none; } }
+.progress-text {
+  font-family: "IBM Plex Mono", monospace; font-size: 12.5px;
+  color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.progress-text b { color: var(--ink); font-size: 1.05rem; font-weight: 600; }
+.reset {
+  font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: .06em;
+  text-transform: uppercase; background: none; border: 1px solid var(--rule);
+  color: var(--muted); padding: 5px 11px; border-radius: 3px; cursor: pointer;
+}
+.reset:hover { color: var(--ink); border-color: var(--muted); }
+
+/* generic section */
+section { margin-top: 68px; }
+.sec-head { display: flex; align-items: baseline; gap: 13px; margin-bottom: 8px; }
+.sec-head h2 { font-size: 1.7rem; }
+.sec-num { font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: .12em; color: var(--accent); padding-top: 4px; }
+.sec-intro { color: var(--ink-soft); max-width: 68ch; margin: 10px 0 0; }
+
+/* rules cards */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 28px; }
+.card {
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: 4px; padding: 20px 21px 22px; box-shadow: var(--shadow);
+}
+.card h3 { font-size: 1.05rem; margin-bottom: 9px; }
+.card p { margin: 0; font-size: 14.5px; color: var(--ink-soft); }
+
+/* tier */
+.tier { margin-top: 50px; }
+.tier-bar {
+  display: flex; align-items: baseline; gap: 15px;
+  padding-bottom: 9px; border-bottom: 2px solid var(--ink);
+}
+.tier-tag {
+  font-family: "IBM Plex Mono", monospace; font-size: 11px;
+  letter-spacing: .14em; text-transform: uppercase;
+  background: var(--ink); color: var(--paper); padding: 3px 9px;
+  border-radius: 2px; white-space: nowrap;
+}
+.tier-bar h3 { font-size: 1.32rem; flex: 1; }
+.tier-meta {
+  font-family: "IBM Plex Mono", monospace; font-size: 11.5px;
+  color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums;
+}
+.tier-why {
+  font-family: Newsreader, Georgia, serif; font-size: 1.02rem; font-style: italic;
+  color: var(--muted); margin: 12px 0 0; max-width: 70ch;
+}
+
+/* drill */
+.drill {
+  margin-top: 18px; background: var(--surface);
+  border: 1px solid var(--rule); border-radius: 5px;
+  box-shadow: var(--shadow); overflow: hidden;
+}
+.drill-head {
+  display: grid; grid-template-columns: auto 44px 1fr; align-items: start;
+  gap: 0 14px; padding: 18px 22px 4px;
+}
+.tick {
+  appearance: none; -webkit-appearance: none;
+  width: 21px; height: 21px; margin: 3px 0 0;
+  border: 1.5px solid var(--rule); border-radius: 4px;
+  background: var(--paper); cursor: pointer; position: relative; flex: none;
+}
+.tick:hover { border-color: var(--accent-dim); }
+.tick:checked { background: var(--done); border-color: var(--done); }
+.tick:checked::after {
+  content: ""; position: absolute; left: 6.5px; top: 2.5px;
+  width: 5px; height: 10px; border: solid #fff;
+  border-width: 0 2px 2px 0; transform: rotate(42deg);
+}
+.drill-no {
+  font-family: "IBM Plex Mono", monospace; font-size: 1.25rem; font-weight: 500;
+  color: var(--accent); font-variant-numeric: tabular-nums; line-height: 1.15;
+}
+.drill-title { font-family: Newsreader, Georgia, serif; font-weight: 600; font-size: 1.18rem; line-height: 1.3; }
+.drill.done .drill-title { color: var(--muted); }
+.drill.done .drill-no { color: var(--done); }
+
+.drill-body { padding: 6px 22px 20px 102px; }
+.goal { margin: 6px 0 0; color: var(--ink-soft); font-size: 15px; }
+
+.lookup { margin: 15px 0 0; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.lookup-label {
+  font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--muted); margin-right: 4px;
+}
+.chip {
+  font-family: "IBM Plex Mono", monospace; font-size: 12px;
+  background: var(--accent-wash); color: var(--accent);
+  padding: 2.5px 8px; border-radius: 3px; white-space: nowrap;
+}
+
+.checkpoint {
+  margin: 16px 0 0; border-left: 3px solid var(--copper);
+  background: var(--surface-2); padding: 13px 17px; border-radius: 0 4px 4px 0;
+}
+.checkpoint-label {
+  font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: .11em;
+  text-transform: uppercase; color: var(--copper); margin: 0 0 6px;
+}
+.checkpoint p { margin: 0; font-size: 14.5px; color: var(--ink-soft); }
+.checkpoint .num {
+  font-family: "IBM Plex Mono", monospace; font-weight: 600;
+  color: var(--ink); font-variant-numeric: tabular-nums;
+}
+
+details { margin: 14px 0 0; }
+summary {
+  cursor: pointer; font-family: "IBM Plex Mono", monospace;
+  font-size: 11.5px; letter-spacing: .07em; text-transform: uppercase;
+  color: var(--muted); list-style: none; display: inline-flex; align-items: center; gap: 7px;
+  padding: 4px 0;
+}
+summary::-webkit-details-marker { display: none; }
+summary::before { content: "▸"; font-size: 10px; transition: transform .15s ease; }
+details[open] summary::before { transform: rotate(90deg); }
+@media (prefers-reduced-motion: reduce) { summary::before { transition: none; } }
+summary:hover { color: var(--accent); }
+details > div { padding: 10px 0 0; font-size: 14.5px; color: var(--ink-soft); }
+details > div p { margin: 0 0 9px; }
+details > div p:last-child { margin-bottom: 0; }
+
+.teach {
+  margin: 15px 0 0; padding: 12px 0 0; border-top: 1px solid var(--rule-soft);
+  font-family: Newsreader, Georgia, serif; font-size: 1.02rem;
+  color: var(--ink-soft); line-height: 1.5;
+}
+.teach b {
+  font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: .11em;
+  text-transform: uppercase; color: var(--accent); font-weight: 500;
+  display: block; margin-bottom: 3px;
+}
+
+pre {
+  margin: 10px 0 0; padding: 14px 17px; border-radius: 4px;
+  background: var(--code-bg); color: var(--code-ink); overflow-x: auto;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 12.7px; line-height: 1.6;
+}
+pre code { background: none; padding: 0; font-size: inherit; color: inherit; }
+
+.closer {
+  margin-top: 70px; padding-top: 26px; border-top: 2px solid var(--ink);
+  font-family: Newsreader, Georgia, serif; font-size: 1.12rem;
+  line-height: 1.6; color: var(--ink-soft); max-width: 64ch;
+}
+.closer strong { color: var(--ink); font-weight: 600; }
+
+@media (max-width: 620px) {
+  .wrap { padding: 0 18px 84px; }
+  .mast { padding-top: 44px; }
+  .drill-head { grid-template-columns: auto auto 1fr; padding: 16px 18px 4px; }
+  .drill-body { padding: 6px 18px 18px 18px; }
+}
+</style>
+
+<div class="wrap">
+
+<header class="mast">
+  <p class="eyebrow">Self-study workbook · Prep for the series</p>
+  <h1>Fourteen ASE drills</h1>
+  <p class="standfirst">Everything you need to know before you can teach ASE, as fourteen short exercises with a number to check yourself against. Each checkpoint below was produced by actually running the drill on ASE 3.29.0 — if your answer matches, you got it right for the right reason.</p>
+
+  <div class="progress">
+    <div class="progress-text"><b id="pcount">0</b> / 14 done</div>
+    <div class="progress-bar"><div class="progress-fill" id="pfill"></div></div>
+    <button class="reset" id="reset" type="button">Reset</button>
+  </div>
+</header>
+
+<section>
+  <div class="sec-head"><span class="sec-num">A</span><h2>How to work through these</h2></div>
+  <p class="sec-intro">You are learning this in order to explain it. That changes the method: understanding a script well enough to run it is a much lower bar than understanding it well enough to answer a stranger's question about it in the comments.</p>
+
+  <div class="cards">
+    <div class="card">
+      <h3>Type it, never paste it</h3>
+      <p>You will type this code on camera. Muscle memory for <code>atoms.calc = EMT()</code> is worth more now than saved minutes.</p>
+    </div>
+    <div class="card">
+      <h3>Predict before you run</h3>
+      <p>Write down the number you expect, then run. Every gap between prediction and output is exactly the misconception a beginner will have.</p>
+    </div>
+    <div class="card">
+      <h3>Read docstrings, not tutorials</h3>
+      <p><code>help(bulk)</code> and <code>bulk??</code> in Jupyter. ASE's source is short and readable — going there once beats searching ten times.</p>
+    </div>
+    <div class="card">
+      <h3>Keep a failure log</h3>
+      <p>Every error you hit is an episode beat. Screenshot the traceback and note what fixed it — that file becomes your teaching gold.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="sec-num">B</span><h2>The drills</h2></div>
+  <p class="sec-intro">Roughly eleven hours of work, comfortable across two or three weeks. Do them in order — each tier assumes the one above it. Tick them off as you go; your progress is remembered in this browser.</p>
+
+  <!-- TIER 1 -->
+  <div class="tier">
+    <div class="tier-bar">
+      <span class="tier-tag">Tier 1</span>
+      <h3>The Atoms object</h3>
+      <span class="tier-meta">4 drills · ~2 hrs</span>
+    </div>
+    <p class="tier-why">Before any physics: an ASE simulation is five NumPy arrays in a trench coat. Get fluent with them and two thirds of your future confusion never happens.</p>
+
+    <article class="drill" id="d1">
+      <div class="drill-head">
+        <input type="checkbox" class="tick" data-drill="1" aria-label="Mark drill 1 done">
+        <div class="drill-no">01</div>
+        <div class="drill-title">Build a water molecule and measure it</div>
+      </div>
+      <div class="drill-body">
+        <p class="goal">Make an H<sub>2</sub>O molecule, print its positions array, then measure the O–H bond length and the H–O–H angle from the coordinates — first by hand with NumPy, then with ASE's built-in methods. They must agree.</p>
+        <div class="lookup"><span class="lookup-label">Look up</span>
+          <span class="chip">ase.build.molecule</span><span class="chip">atoms.positions</span><span class="chip">get_distance</span><span class="chip">get_angle</span><span class="chip">ase.visualize.view</span>
+        </div>
+        <div class="checkpoint">
+          <p class="checkpoint-label">Checkpoint</p>
+          <p>3 atoms · O–H = <span class="num">0.969 Å</span> · H–O–H = <span class="num">104.0°</span></p>
+        </div>
+        <details><summary>If you're stuck</summary><div>
+          <p>Atom 0 is oxygen, atoms 1 and 2 are the hydrogens. <code>get_angle(1, 0, 2)</code> — the middle index is the vertex.</p>
+          <p>By hand: <code>np.linalg.norm(pos[1] - pos[0])</code>, and the angle from <code>np.arccos</code> of the normalised dot product of the two O–H vectors.</p>
+        </div></details>
+        <p class="teach"><b>Why this is drill one</b>Every ASE object is coordinates plus bookkeeping. Doing the geometry by hand once proves there is nothing hidden in there.</p>
+      </div>
+    </article>
+
+    <article class="drill" id="d2">
+      <div class="drill-head">
+        <input type="checkbox" class="tick" data-drill="2" aria-label="Mark drill 2 done">
+        <div class="drill-no">02</div>
+        <div class="drill-title">Build copper, then derive its density</div>
+      </div>
+      <div class="drill-body">
+        <p class="goal">Build fcc copper at <em>a</em> = 3.61 Å twice — the primitive cell and the cubic cell. Count the atoms in each, get the volumes, and compute the mass density in g cm<sup>−3</sup>. Compare with the handbook value of 8.96.</p>
+        <div class="lookup"><span class="lookup-label">Look up</span>
+          <span class="chip">ase.build.bulk</span><span class="chip">cubic=True</span><span class="chip">get_volume</span><span class="chip">get_masses</span><span class="chip">atoms.cell</span>
+        </div>
+        <div class="checkpoint">
+          <p class="checkpoint-label">Checkpoint</p>
+          <p>Primitive: 1 atom, <span class="num">11.761 Å³</span> · Cubic: 4 atoms, <span class="num">47.05 Å³</span> · density <span class="num">8.97 g cm⁻³</span> either way</p>
+        </div>
+        <details><summary>If you're stuck</summary><div>
+          <p>Unit conversion: 1 amu Å<sup>−3</sup> = 1.66054 g cm<sup>−3</sup>.</p>
+          <p>The density must come out identical for both cells. If it doesn't, you counted atoms in one cell and took the volume of the other.</p>
+        </div></details>
+        <p class="teach"><b>The teachable moment</b>Beginners assume "the unit cell" is one thing. Two cells, four times the atoms, four times the volume, same density — that lands the concept in thirty seconds on camera.</p>
+      </div>
+    </article>
+
+    <article class="drill" id="d3">
+      <div class="drill-head">
+        <input type="checkbox" class="tick" data-drill="3" aria-label="Mark drill 3 done">
+        <div class="drill-no">03</div>
+        <div class="drill-title">Supercells, slicing, and deleting atoms</div>
+      </div>
+      <div class="drill-body">
+        <p class="goal">Repeat the cubic Cu cell 3×3×3. Count the atoms and check the new cell lengths. Then: delete atom 0; select every atom with <em>z</em> &lt; 4 Å; make a mixed Cu–Au system by changing the symbols of ten atoms; and translate everything by half a lattice vector and wrap it back into the box.</p>
+        <div class="lookup"><span class="lookup-label">Look up</span>
+          <span class="chip">atoms * (3,3,3)</span><span class="chip">del atoms[i]</span><span class="chip">atoms[mask]</span><span class="chip">set_chemical_symbols</span><span class="chip">translate</span><span class="chip">wrap</span>
+        </div>
+        <div class="checkpoint">
+          <p class="checkpoint-label">Checkpoint</p>
+          <p><span class="num">108 atoms</span> · cell lengths <span class="num">10.83 Å</span> in all three directions</p>
+        </div>
+        <details><summary>If you're stuck</summary><div>
+          <p><code>atoms.positions[:, 2] &lt; 4</code> gives you a boolean mask you can index the Atoms object with directly.</p>
+          <p>After <code>translate</code>, some atoms sit outside the cell. <code>wrap()</code> folds them back. Nothing physical changed — verify by checking the potential energy is unaffected.</p>
+        </div></details>
+        <p class="teach"><b>The teachable moment</b>That wrap check — same energy, different coordinates — is the cleanest possible demonstration of what periodicity means, and it takes one line.</p>
+      </div>
+    </article>
+
+    <article class="drill" id="d4">
+      <div class="drill-head">
+        <input type="checkbox" class="tick" data-drill="4" aria-label="Mark drill 4 done">
+        <div class="drill-no">04</div>
+        <div class="drill-title">Write and read four file formats</div>
+      </div>
+      <div class="drill-body">
+        <p class="goal">Take your 32-atom Cu cell and round-trip it through <code>.xyz</code>, <code>.cif</code>, <code>.traj</code> and a VASP <code>POSCAR</code>. After each read-back, verify the atom count and that the cell survived. Then find out what plain <code>.xyz</code> loses that <code>extxyz</code> keeps.</p>
+        <div class="lookup"><span class="lookup-label">Look up</span>
+          <span class="chip">ase.io.write</span><span class="chip">ase.io.read</span><span class="chip">format='extxyz'</span><span class="chip">index=':'</span>
+        </div>
+        <div class="checkpoint">
+          <p class="checkpoint-label">Checkpoint</p>
+          <p>All four give back <span class="num">32 atoms</span> with the cell intact — as long as you write <code>extxyz</code>, not bare <code>xyz</code>. Bare <code>.xyz</code> has no place to store a cell, so the round-trip silently returns a non-periodic cluster.</p>
+        </div>
+        <details><summary>If you're stuck</summary><div>
+          <p><code>np.allclose(back.cell, original.cell)</code> is your check. When it fails for plain xyz, that's the answer, not a bug.</p>
+          <p><code>read(fn)</code> returns the last frame; <code>read(fn, index=':')</code> returns a list of all of them. That distinction bites everyone exactly once.</p>
+        </div></details>
+        <p class="teach"><b>The teachable moment</b>Silent data loss on a format nobody warned them about. Demonstrating it once inoculates your viewers against a bug that can survive into a paper.</p>
+      </div>
+    </article>
+  </div>
+
+  <!-- TIER 2 -->
+  <div class="tier">
+    <div class="tier-bar">
+      <span class="tier-tag">Tier 2</span>
+      <h3>Calculators, and getting real numbers</h3>
+      <span class="tier-meta">4 drills · ~3 hrs</span>
+    </div>
+    <p class="tier-why">Where ASE stops being a structure editor. By the end of this tier you will have reproduced two measured properties of copper from nothing but a potential — that's the moment the tool becomes credible.</p>
+
+    <article class="drill" id="d5">
+      <div class="drill-head">
+        <input type="checkbox" class="tick" data-drill="5" aria-label="Mark drill 5 done">
+        <div class="drill-no">05</div>
+        <div class="drill-title">Your first energy and force</div>
+      </div>
+      <div class="drill-body">
+        <p class="goal">Attach the EMT calculator to a 2×2×2 supercell of cubic Cu. Get the potential energy, the energy per atom, and the forces. Explain the force result. Then displace one atom by 0.1 Å and look again.</p>
+        <div class="lookup"><span class="lookup-label">Look up</span>
+          <span class="chip">ase.calculators.emt.EMT</span><span class="chip">atoms.calc = …</span><span class="chip">get_potential_energy</span><span class="chip">get_forces</span>
+        </div>
+        <div class="checkpoint">
+          <p class="checkpoint-label">Checkpoint</p>
+          <p>32 atoms · <span class="num">−0.0057 eV/atom</span> · every force component <span class="num">exactly 0.0</span> — not small, but bit-for-bit zero. Work out why before you read the hint.</p>
+        </div>
+        <details><summary>If you're stuck</summary><div>
+          <p>Every atom in a perfect fcc crystal sits at a centre of inversion symmetry. For every neighbour pulling one way there is an identical neighbour pulling exactly the opposite way, and the contributions cancel in floating point too.</p>
+          <p>Displace one atom and the symmetry breaks: that atom and its neighbours all pick up non-zero forces, and the total force over the whole cell still sums to zero (Newton's third law).</p>
+        </div></details>
+        <p class="teach"><b>The teachable moment</b>Exactly-zero forces look like a broken calculator to a beginner. Turning it into a symmetry argument, then breaking it deliberately, is a complete five-minute segment.</p>
+      </div>
+    </article>
+
+    <article class="drill" id="d6">
+      <div class="drill-head">
+        <input type="checkbox" class="tick" data-drill="6" aria-label="Mark drill 6 done">
+        <div class="drill-no">06</div>
+        <div class="drill-title">Scan the Lennard-Jones dimer curve</div>
+      </div>
+      <div class="drill-body">
+        <p class="goal">Two argon atoms, separation from 3.0 to 6.0 Å. Compute the energy at each separation with ASE's <code>LennardJones</code> (ε = 0.0104 eV, σ = 3.40 Å) and plot it. Find the minimum numerically and check both its position and its depth against the analytic predictions.</p>
+        <div class="lookup"><span class="lookup-label">Look up</span>
+          <span class="chip">ase.Atoms</span><span class="chip">calculators.lj.LennardJones</span><span class="chip">epsilon, sigma, rc</span><span class="chip">np.argmin</span>
+        </div>
+        <div class="checkpoint">
+          <p class="checkpoint-label">Checkpoint</p>
+          <p>Minimum at <span class="num">3.82 Å</span>, matching 2<sup>1/6</sup>σ = <span class="num">3.816 Å</span> · depth <span class="num">−0.0104 eV</span>, exactly −ε</p>
+        </div>
+        <details><summary>If you're stuck</summary><div>
+          <p>Set <code>rc</code> well beyond your largest separation (say 15 Å) or the cutoff shift will move your well depth and you'll chase a phantom error.</p>
+          <p>Build each dimer as <code>Atoms('Ar2', positions=[[0,0,0],[r,0,0]])</code> with no cell and no pbc.</p>
+        </div></details>
+        <p class="teach"><b>The teachable moment</b>Two parameters you typed in, two numbers that come back out with the textbook relationship between them. That is what "the potential <em>is</em> the physics" means, shown rather than said.</p>
+      </div>
+    </article>
+
+    <article class="drill" id="d7">
+      <div class="drill-head">
+        <input type="checkbox" class="tick" data-drill="7" aria-label="Mark drill 7 done">
+        <div class="drill-no">07</div>
+        <div class="drill-title">Cohesive energy of copper</div>
+      </div>
+      <div class="drill-body">
+        <p class="goal">How much energy does it cost to pull one copper atom out of the crystal to infinity? Compute the bulk energy per atom, then the energy of a single isolated Cu atom in a large empty box, and take the difference. Compare with the experimental 3.49 eV/atom.</p>
+        <div class="lookup"><span class="lookup-label">Look up</span>
+          <span class="chip">bulk('Cu')</span><span class="chip">Atoms('Cu', cell=…, pbc=False)</span><span class="chip">get_potential_energy</span>
+        </div>
+        <div class="checkpoint">
+          <p class="checkpoint-label">Checkpoint</p>
+          <p><span class="num">3.516 eV/atom</span> against an experimental <span class="num">3.49 eV/atom</span> — under 1% error from a potential you can read in an afternoon</p>
+        </div>
+        <details><summary>If you're stuck</summary><div>
+          <p>The isolated atom needs <code>pbc=False</code> and a cell big enough that it can't see its own images — 12 Å is plenty for EMT.</p>
+          <p>Sign convention: cohesive energy is defined positive, so it's E(isolated) − E(bulk per atom).</p>
+        </div></details>
+        <p class="teach"><b>The teachable moment</b>This is your first genuine prediction — a measured property of a real metal, recovered on a laptop in eight lines. Put the number next to the handbook value on screen.</p>
+      </div>
+    </article>
+
+    <article class="drill" id="d8">
+      <div class="drill-head">
+        <input type="checkbox" class="tick" data-drill="8" aria-label="Mark drill 8 done">
+        <div class="drill-no">08</div>
+        <div class="drill-title">Equation of state: lattice constant and bulk modulus</div>
+      </div>
+      <div class="drill-body">
+        <p class="goal">Scan the lattice constant from 3.4 to 3.8 Å in nine steps, recording volume and energy at each. Fit an equation of state and extract the equilibrium volume, the equilibrium lattice constant, and the bulk modulus in GPa. Plot the fit over your points.</p>
+        <div class="lookup"><span class="lookup-label">Look up</span>
+          <span class="chip">ase.eos.EquationOfState</span><span class="chip">eos.fit()</span><span class="chip">eos.plot()</span><span class="chip">ase.units.kJ</span>
+        </div>
+        <div class="checkpoint">
+          <p class="checkpoint-label">Checkpoint</p>
+          <p><em>V</em><sub>0</sub> = <span class="num">11.57 Å³</span> · <em>a</em><sub>0</sub> = <span class="num">3.590 Å</span> (expt 3.61) · <em>B</em> = <span class="num">133 GPa</span> (expt ~140)</p>
+        </div>
+        <details><summary>If you're stuck</summary><div>
+          <p>For fcc, the primitive volume is <em>a</em>³/4, so <code>a0 = (4 * v0) ** (1/3)</code>.</p>
+          <p>The unit conversion for the modulus is <code>B / kJ * 1e24</code> with <code>from ase.units import kJ</code>. Getting a number near 10<sup>−3</sup> means you skipped it.</p>
+        </div></details>
+        <p class="teach"><b>The teachable moment</b>Two independent properties from one nine-point scan — and both land within a few percent. This is the drill that convinces a sceptical viewer the whole enterprise is real.</p>
+      </div>
+    </article>
+  </div>
+
+  <!-- TIER 3 -->
+  <div class="tier">
+    <div class="tier-bar">
+      <span class="tier-tag">Tier 3</span>
+      <h3>Structures, defects, and relaxation</h3>
+      <span class="tier-meta">4 drills · ~4 hrs</span>
+    </div>
+    <p class="tier-why">Everything a real simulation needs before the dynamics start. This tier is also where your own research vocabulary — surfaces, adsorption, defects — first appears in the workbook.</p>
+
+    <article class="drill" id="d9">
+      <div class="drill-head">
+        <input type="checkbox" class="tick" data-drill="9" aria-label="Mark drill 9 done">
+        <div class="drill-no">09</div>
+        <div class="drill-title">Build and relax a Cu(111) slab</div>
+      </div>
+      <div class="drill-body">
+        <p class="goal">Make a 3-layer Cu(111) slab, 2×2 in-plane, with 8 Å of vacuum. Freeze everything below the top layer using the layer tags, then relax with BFGS to <code>fmax=0.05</code>. Measure how much the top interlayer spacing changed from the bulk value.</p>
+        <div class="lookup"><span class="lookup-label">Look up</span>
+          <span class="chip">ase.build.fcc111</span><span class="chip">vacuum=</span><span class="chip">atom.tag</span><span class="chip">constraints.FixAtoms</span><span class="chip">optimize.BFGS</span>
+        </div>
+        <div class="checkpoint">
+          <p class="checkpoint-label">Checkpoint</p>
+          <p><span class="num">12 atoms</span> for size (2,2,3) · the top layer relaxes <em>inward</em>, contracting the first interlayer spacing by roughly a percent</p>
+        </div>
+        <details><summary>If you're stuck</summary><div>
+          <p><code>fcc111</code> tags layers 1, 2, 3 from the top. So <code>FixAtoms(mask=[a.tag &gt; 1 for a in slab])</code> frees only the surface layer.</p>
+          <p>Pass <code>logfile=None</code> to BFGS to silence it, or leave it on — watching <code>fmax</code> fall is worth showing on camera.</p>
+        </div></details>
+        <p class="teach"><b>The teachable moment</b>Surface relaxation is a real, measurable phenomenon that beginners have never heard of, and it falls out of a five-line script. Excellent episode material.</p>
+      </div>
+    </article>
+
+    <article class="drill" id="d10">
+      <div class="drill-head">
+        <input type="checkbox" class="tick" data-drill="10" aria-label="Mark drill 10 done">
+        <div class="drill-no">10</div>
+        <div class="drill-title">Binding energy of an adatom</div>
+      </div>
+      <div class="drill-body">
+        <p class="goal">Put a single Cu adatom on the fcc hollow site of your relaxed slab, 2 Å above the surface. Relax again. Compute the binding energy as E(slab+adatom) − E(slab) − E(isolated atom). Then repeat for the <code>hcp</code>, <code>bridge</code> and <code>ontop</code> sites and rank them.</p>
+        <div class="lookup"><span class="lookup-label">Look up</span>
+          <span class="chip">ase.build.add_adsorbate</span><span class="chip">position='fcc'</span><span class="chip">height=</span>
+        </div>
+        <div class="checkpoint">
+          <p class="checkpoint-label">Checkpoint</p>
+          <p>fcc hollow: <span class="num">−2.79 eV</span>. Negative means bound. The hollow sites should beat bridge, which should beat ontop — more neighbours, stronger binding.</p>
+        </div>
+        <details><summary>If you're stuck</summary><div>
+          <p>Re-apply the <code>FixAtoms</code> constraint after <code>add_adsorbate</code> — copying the slab does not always carry it, and an unconstrained slab will drift and ruin the energy difference.</p>
+          <p>All three energies must use the same calculator settings, or the difference is meaningless.</p>
+        </div></details>
+        <p class="teach"><b>The teachable moment</b>An energy difference between two calculations is the workhorse of computational materials science. Site ranking makes the abstraction concrete and gives viewers something to predict before you run it.</p>
+      </div>
+    </article>
+
+    <article class="drill" id="d11">
+      <div class="drill-head">
+        <input type="checkbox" class="tick" data-drill="11" aria-label="Mark drill 11 done">
+        <div class="drill-no">11</div>
+        <div class="drill-title">Vacancy formation energy</div>
+      </div>
+      <div class="drill-body">
+        <p class="goal">Take a 3×3×3 supercell of cubic Cu (108 atoms), record its energy, then delete one atom and relax. The formation energy is E(defective) − E(perfect) × (N−1)/N. Compare with the experimental ~1.28 eV. Then check how much the answer moves if you use a 2×2×2 cell instead.</p>
+        <div class="lookup"><span class="lookup-label">Look up</span>
+          <span class="chip">del atoms[0]</span><span class="chip">BFGS(fmax=0.02)</span><span class="chip">len(atoms)</span>
+        </div>
+        <div class="checkpoint">
+          <p class="checkpoint-label">Checkpoint</p>
+          <p>108 atoms → <span class="num">1.244 eV</span> against experiment's <span class="num">~1.28 eV</span>. The smaller cell gives a visibly different answer.</p>
+        </div>
+        <details><summary>If you're stuck</summary><div>
+          <p>That (N−1)/N scaling is the whole trick — you are comparing systems with different atom counts, so you must reference against the same number of atoms' worth of perfect crystal.</p>
+          <p>The small-cell discrepancy is the vacancy interacting with its own periodic images. Finite-size effects, demonstrated rather than asserted.</p>
+        </div></details>
+        <p class="teach"><b>The teachable moment</b>Convergence with system size is the single most under-taught idea in beginner MD. Two runs, two different answers, one lesson: always check that your box is big enough.</p>
+      </div>
+    </article>
+
+    <article class="drill" id="d12">
+      <div class="drill-head">
+        <input type="checkbox" class="tick" data-drill="12" aria-label="Mark drill 12 done">
+        <div class="drill-no">12</div>
+        <div class="drill-title">Nanoparticles and neighbour lists</div>
+      </div>
+      <div class="drill-body">
+        <p class="goal">Build a 3-shell Cu icosahedron and a truncated octahedron. Then use ASE's neighbour list on bulk Cu to compute the average coordination number and the nearest-neighbour distance. Finally, compute the coordination of every atom in the nanoparticle and colour-code surface versus interior.</p>
+        <div class="lookup"><span class="lookup-label">Look up</span>
+          <span class="chip">ase.cluster.Icosahedron</span><span class="chip">ase.cluster.Octahedron</span><span class="chip">neighborlist.neighbor_list</span><span class="chip">np.bincount</span>
+        </div>
+        <div class="checkpoint">
+          <p class="checkpoint-label">Checkpoint</p>
+          <p>Icosahedron(3 shells) = <span class="num">55 atoms</span> · Octahedron(length 5, cutoff 1) = <span class="num">79 atoms</span> · bulk coordination <span class="num">12</span> · nn distance <span class="num">2.5527 Å</span> = <em>a</em>/√2</p>
+        </div>
+        <details><summary>If you're stuck</summary><div>
+          <p><code>i, j, d = neighbor_list('ijd', atoms, cutoff=3.0)</code> returns flat arrays of pairs and distances. <code>np.bincount(i)</code> counts each atom's neighbours.</p>
+          <p>Pick your cutoff between the first and second neighbour shells — plot the RDF first if you're unsure where that is.</p>
+        </div></details>
+        <p class="teach"><b>The teachable moment</b>55 is a magic number, and the nearest-neighbour distance comes out as <em>a</em>/√2 to four decimal places. Both are checkable by hand, which is exactly what makes them convincing.</p>
+      </div>
+    </article>
+  </div>
+
+  <!-- TIER 4 -->
+  <div class="tier">
+    <div class="tier-bar">
+      <span class="tier-tag">Tier 4</span>
+      <h3>Limits, and the bridge to dynamics</h3>
+      <span class="tier-meta">2 drills · ~2 hrs</span>
+    </div>
+    <p class="tier-why">The last two drills are the ones that make you a trustworthy teacher rather than a confident one.</p>
+
+    <article class="drill" id="d13">
+      <div class="drill-head">
+        <input type="checkbox" class="tick" data-drill="13" aria-label="Mark drill 13 done">
+        <div class="drill-no">13</div>
+        <div class="drill-title">Break your calculator on purpose</div>
+      </div>
+      <div class="drill-body">
+        <p class="goal">EMT was fitted for close-packed metals. Point it at an N<sub>2</sub> molecule anyway: relax the bond, then compute the vibrational frequency with ASE's <code>Vibrations</code>. Compare both against experiment (1.098 Å, 2359 cm<sup>−1</sup>). Then work out how you would have known this was a bad idea <em>before</em> running it.</p>
+        <div class="lookup"><span class="lookup-label">Look up</span>
+          <span class="chip">ase.vibrations.Vibrations</span><span class="chip">vib.run()</span><span class="chip">vib.summary()</span><span class="chip">get_energies</span>
+        </div>
+        <div class="checkpoint">
+          <p class="checkpoint-label">Checkpoint</p>
+          <p>Bond <span class="num">0.998 Å</span> versus 1.098 · stretch <span class="num">1231 cm⁻¹</span> versus 2359. Off by nearly a factor of two, with no error, no warning, and a perfectly clean-looking output.</p>
+        </div>
+        <details><summary>If you're stuck</summary><div>
+          <p><code>Vibrations</code> writes cache files to a directory. Delete it between runs (<code>shutil.rmtree('vib')</code>) or you'll silently reuse stale results — a good bug to demonstrate in its own right.</p>
+          <p>Convert energies to wavenumbers with the factor 8065.54 cm<sup>−1</sup> per eV.</p>
+          <p>How you'd know in advance: read what the potential was fitted to. EMT's own documentation lists its supported elements and its intended regime, and diatomic nitrogen is nowhere in it.</p>
+        </div></details>
+        <p class="teach"><b>Why this is the most important drill</b>A confidently wrong number with no warning attached is the defining failure mode of computational science, and almost no free tutorial shows one. Making this an episode is the single strongest signal you can send that your channel is worth trusting.</p>
+      </div>
+    </article>
+
+    <article class="drill" id="d14">
+      <div class="drill-head">
+        <input type="checkbox" class="tick" data-drill="14" aria-label="Mark drill 14 done">
+        <div class="drill-no">14</div>
+        <div class="drill-title">Set something in motion</div>
+      </div>
+      <div class="drill-body">
+        <p class="goal">The bridge into the series proper. Take your Cu supercell, give the atoms velocities from a Maxwell–Boltzmann distribution at 300 K, and integrate with velocity Verlet for 200 steps at 1 fs, printing energy and temperature every 10 steps. Then answer one question: why does the temperature immediately fall to roughly half of what you asked for?</p>
+        <div class="lookup"><span class="lookup-label">Look up</span>
+          <span class="chip">md.velocitydistribution.thermalize_momenta</span><span class="chip">md.verlet.VelocityVerlet</span><span class="chip">ase.units.fs</span><span class="chip">dyn.attach</span><span class="chip">get_temperature</span>
+        </div>
+        <div class="checkpoint">
+          <p class="checkpoint-label">Checkpoint</p>
+          <p>Total energy should stay flat to about <span class="num">0.006 meV/atom</span> over the run. Temperature starts near 300 K and settles near <span class="num">150 K</span>.</p>
+        </div>
+        <details><summary>If you're stuck</summary><div>
+          <p>Note the modern spelling: <code>thermalize_momenta</code> replaced <code>MaxwellBoltzmannDistribution</code> in ASE 3.29, and <code>ase.md.npt.NPT</code> moved to <code>ase.md.melchionna.MelchionnaNPT</code>. Older tutorials will show you the old names.</p>
+          <p><code>timestep=1.0 * units.fs</code> — ASE's internal time unit is not the femtosecond, and forgetting the conversion is the classic first MD bug.</p>
+          <p>The temperature halves because you put all the energy in as kinetic. Equipartition then splits it evenly between kinetic and potential, so the kinetic half — which is what temperature measures — drops to 50%. Start at 600 K if you want to end near 300 K.</p>
+        </div></details>
+        <p class="teach"><b>Where this leads</b>This is episode 10 of the series, and every drill above it is now a prerequisite you've personally done. You are ready to record.</p>
+      </div>
+    </article>
+  </div>
+</section>
+
+<p class="closer"><strong>When all fourteen are ticked</strong>, you'll have reproduced four measured properties of copper, broken a calculator on purpose, and run your first trajectory — which is more hands-on ASE than most people have when they start a PhD project with it. At that point record episodes 1 through 12 back to back, because you'll have lived every error your viewers are about to hit.</p>
+
+</div>
+
+<script>
+(function () {
+  var KEY = 'ase-drills-v1';
+  var ticks = Array.prototype.slice.call(document.querySelectorAll('.tick'));
+  var fill = document.getElementById('pfill');
+  var count = document.getElementById('pcount');
+
+  function load() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) { return {}; }
+  }
+  function save(state) {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+  }
+  function render() {
+    var n = 0;
+    ticks.forEach(function (t) {
+      var card = t.closest('.drill');
+      if (t.checked) { n++; card.classList.add('done'); }
+      else { card.classList.remove('done'); }
+    });
+    count.textContent = n;
+    fill.style.width = (n / ticks.length * 100) + '%';
+  }
+
+  var state = load();
+  ticks.forEach(function (t) {
+    if (state[t.dataset.drill]) t.checked = true;
+    t.addEventListener('change', function () {
+      var s = load();
+      if (t.checked) s[t.dataset.drill] = 1; else delete s[t.dataset.drill];
+      save(s);
+      render();
+    });
+  });
+
+  document.getElementById('reset').addEventListener('click', function () {
+    ticks.forEach(function (t) { t.checked = false; });
+    save({});
+    render();
+  });
+
+  render();
+})();
+</script>
